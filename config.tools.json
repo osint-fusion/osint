@@ -1,0 +1,38 @@
+{
+  "sherlock": {
+    "name": "Sherlock",
+    "supported_target_types": ["username"],
+    "command": "sherlock",
+    "timeout": 120
+  },
+  "maigret": {
+    "name": "Maigret",
+    "supported_target_types": ["username"],
+    "command": "maigret",
+    "timeout": 180
+  },
+  "theharvester": {
+    "name": "theHarvester",
+    "supported_target_types": ["domain"],
+    "command": "theHarvester",
+    "timeout": 150
+  },
+  "amass": {
+    "name": "OWASP Amass",
+    "supported_target_types": ["domain"],
+    "command": "amass",
+    "timeout": 180
+  },
+  "whatweb": {
+    "name": "WhatWeb",
+    "supported_target_types": ["domain", "ip"],
+    "command": "whatweb",
+    "timeout": 60
+  },
+  "spiderfoot": {
+    "name": "SpiderFoot",
+    "supported_target_types": ["domain", "ip"],
+    "command": "spiderfoot",
+    "timeout": 240
+  }
+}

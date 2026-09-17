@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSINT FUSION</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="logo-box">
+                <span class="logo-icon">⚡</span>
+                <h1 class="logo-text">OSINT FUSION</h1>
+            </div>
+            <p class="subtitle">منصة موحدة لجمع وتحليل المعلومات المفتوحة المصدر</p>
+            <div class="warning-banner">
+                <span>⚠️ استخدم المنصة فقط على الأهداف التي تملك تصريحاً بفحصها.</span>
+            </div>
+        </header>
+
+        <section class="card input-card">
+            <h2 class="card-title">تحديد الهدف وجمع البيانات</h2>
+            <form id="scanForm" class="scan-form">
+                <div class="form-group">
+                    <label>نوع الهدف</label>
+                    <select id="targetType" class="form-control">
+                        <option value="username">اسم مستخدم (Username)</option>
+                        <option value="domain">اسم دومين (Domain)</option>
+                        <option value="ip">عنوان IP Address</option>
+                        <option value="email">بريد إلكتروني (Email)</option>
+                        <option value="phone">رقم هاتف (Phone)</option>
+                    </select>
+                </div>
+
+                <div class="form-group country-group hidden" id="countrySelectorGroup">
+                    <label>الدولة</label>
+                    <select id="countryCode" class="form-control">
+                        <option value="+964">العراق (+964)</option>
+                        <option value="+966">السعودية (+966)</option>
+                        <option value="+971">الإمارات (+971)</option>
+                        <option value="+20">مصر (+20)</option>
+                    </select>
+                </div>
+
+                <div class="form-group target-input-group">
+                    <label>الهدف</label>
+                    <input type="text" id="targetInput" class="form-control" placeholder="@username" required>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" id="startBtn" class="btn btn-primary">START SCAN</button>
+                    <button type="button" id="cancelBtn" class="btn btn-danger hidden">إلغاء الفحص</button>
+                </div>
+            </form>
+            <div id="errorMessage" class="error-msg hidden"></div>
+        </section>
+
+        <section class="card">
+            <h2 class="card-title">حالة الأدوات في النظام (Tool Status)</h2>
+            <div id="toolsGrid" class="tools-grid"></div>
+        </section>
+
+        <section id="progressSection" class="card hidden">
+            <div class="progress-header">
+                <h3>حالة الفحص النشط: <span id="scanStatusBadge" class="badge">Running</span></h3>
+            </div>
+            <div class="progress-bar-container">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+            <p id="progressStep" class="progress-step-text">جاري تشغيل الأدوات المناسبة...</p>
+        </section>
+
+        <section id="resultsSection" class="results-section hidden">
+            <h2 class="section-title">نتائج التحليل والجمع (Unified Dashboard)</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <span class="metric-value" id="metricTotal">0</span>
+                    <span class="metric-label">إجمالي النتائج الحقيقية</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-value" id="metricToolsCount">0</span>
+                    <span class="metric-label">الأدوات التي عملت بنجاح</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-value" id="metricTime">0s</span>
+                    <span class="metric-label">زمن التنفيذ الإجمالي</span>
+                </div>
+            </div>
+
+            <div class="export-actions">
+                <button onclick="exportResults('json')" class="btn btn-secondary">Export JSON</button>
+                <button onclick="exportResults('csv')" class="btn btn-secondary">Export CSV</button>
+            </div>
+
+            <div id="toolCardsGrid" class="tool-cards-grid"></div>
+
+            <div class="card table-card">
+                <h3 class="card-title">جدول النتائج التفصيلي</h3>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>المصدر</th>
+                                <th>النوع</th>
+                                <th>القيمة</th>
+                                <th>الأداة</th>
+                                <th>مستوى الثقة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="findingsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2 class="card-title">سجل الفحوصات السابقة (Scan History)</h2>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>نوع الهدف</th>
+                            <th>الهدف</th>
+                            <th>التاريخ</th>
+                            <th>الحالة</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <div id="rawModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalToolTitle">Raw Output</h3>
+                <button onclick="closeModal()" class="close-btn">&times;</button>
+            </div>
+            <pre id="rawOutputCode" class="raw-code-block"></pre>
+            <div class="modal-footer">
+                <button onclick="copyRawOutput()" class="btn btn-secondary">نسخ المخرجات</button>
+                <button onclick="closeModal()" class="btn btn-primary">إغلاق</button>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
